@@ -21,9 +21,15 @@ assert(/const questions = \[/.test(html), "dynamic question data missing");
 assert(/const memeSets = \{/.test(html), "meme image sets missing");
 assert(!/media\.tenor\.com/.test(html), "Tenor links should be replaced");
 assert(!/tenor\.com\/search/.test(html), "Tenor attribution links should be replaced");
-assert(/data:image\//.test(html) || /i0\.hdslb\.com\/bfs\/emote/.test(html), "usable meme image sources missing");
+assert(!/data:image\//.test(html), "embedded base64 images should be split into asset files");
+assert(fs.statSync(htmlPath).size < 1024 * 1024, "index.html should stay under 1MB");
 for (let question = 1; question <= 8; question += 1) {
   assert(fs.existsSync(path.join(root, "assets", "memes", `q${question}`)), `q${question} meme directory missing`);
+  for (const choice of ["A", "B", "C", "D"]) {
+    const imagePath = path.join(root, "assets", "memes", `q${question}`, `${choice}.gif`);
+    assert(fs.existsSync(imagePath), `${question}/${choice} meme image missing`);
+    assert(fs.statSync(imagePath).size > 0, `${question}/${choice} meme image is empty`);
+  }
 }
 assert(fs.existsSync(path.join(root, "assets", "memes", "results")), "result meme directory missing");
 assert(/assets\/memes\/q\[题号\]\/\[选项\]\.png/.test(readme), "README question naming rule missing");
