@@ -35,6 +35,7 @@
         var(--paper);
       background-size: 28px 28px;
       letter-spacing: 0;
+      animation: gridDrift 18s linear infinite;
     }
 
     button {
@@ -76,6 +77,7 @@
       border-radius: 8px;
       box-shadow: 4px 4px 0 #f0a323;
       transform: rotate(-3deg);
+      animation: stampWiggle 2.8s ease-in-out infinite;
       flex: 0 0 auto;
     }
 
@@ -140,12 +142,149 @@
       width: 0%;
       height: 100%;
       background: linear-gradient(90deg, var(--a), var(--b), var(--c), var(--d));
+      background-size: 240% 100%;
       transition: width 0.28s ease;
+      animation: progressRun 1.8s linear infinite;
     }
 
     main {
       display: grid;
       align-items: center;
+    }
+
+    body.is-home .progress-wrap,
+    body.is-home .nav {
+      display: none;
+    }
+
+    .home-view {
+      display: none;
+      min-height: clamp(560px, 70vh, 720px);
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 18% 24%, rgba(233, 75, 95, 0.18), transparent 28%),
+        radial-gradient(circle at 78% 20%, rgba(22, 160, 133, 0.18), transparent 30%),
+        radial-gradient(circle at 62% 86%, rgba(240, 163, 35, 0.2), transparent 32%),
+        #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .home-view.active {
+      display: grid;
+      animation: rise 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .home-content {
+      position: relative;
+      z-index: 2;
+      max-width: 760px;
+      padding: clamp(24px, 6vw, 54px);
+      display: grid;
+      gap: 18px;
+    }
+
+    .home-kicker {
+      width: fit-content;
+      padding: 7px 11px;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 900;
+      box-shadow: 3px 3px 0 rgba(23, 23, 23, 0.88);
+      transform: rotate(-1.5deg);
+    }
+
+    .home-title {
+      margin: 0;
+      max-width: 720px;
+      font-size: clamp(38px, 8vw, 78px);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .home-subtitle {
+      margin: 0;
+      max-width: 620px;
+      font-size: clamp(18px, 3.4vw, 28px);
+      line-height: 1.35;
+      font-weight: 900;
+    }
+
+    .home-copy {
+      margin: 0;
+      max-width: 620px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .home-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .home-tags span {
+      padding: 6px 9px;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .start-button {
+      width: fit-content;
+      min-height: 52px;
+      padding: 0 22px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: var(--ink);
+      color: #fff;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 900;
+      box-shadow: 6px 6px 0 rgba(23, 23, 23, 0.9);
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .start-button:hover,
+    .start-button:focus-visible {
+      transform: translate(-3px, -3px) rotate(-0.4deg);
+      box-shadow: 9px 9px 0 rgba(23, 23, 23, 0.9);
+      outline: none;
+    }
+
+    .home-stickers {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .note {
+      position: absolute;
+      padding: 9px 12px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      font-weight: 900;
+      box-shadow: 4px 4px 0 rgba(23, 23, 23, 0.86);
+      animation: floatNote 4s ease-in-out infinite;
+    }
+
+    .note:nth-child(1) { right: 9%; top: 22%; transform: rotate(4deg); color: var(--a); }
+    .note:nth-child(2) { right: 17%; bottom: 22%; transform: rotate(-5deg); color: var(--b); animation-delay: 0.7s; }
+    .note:nth-child(3) { left: 46%; top: 12%; transform: rotate(-3deg); color: var(--c); animation-delay: 1.2s; }
+
+    @keyframes floatNote {
+      0%, 100% { translate: 0 0; }
+      50% { translate: 0 -10px; }
     }
 
     .question-view,
@@ -156,12 +295,46 @@
     .question-view.active,
     .result-view.active {
       display: grid;
-      animation: rise 0.22s ease both;
+      animation: rise 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
     @keyframes rise {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes gridDrift {
+      to { background-position: 28px 28px, 28px 28px, 0 0; }
+    }
+
+    @keyframes stampWiggle {
+      0%, 72%, 100% { transform: rotate(-3deg) scale(1); }
+      78% { transform: rotate(4deg) scale(1.06); }
+      84% { transform: rotate(-6deg) scale(1.02); }
+      90% { transform: rotate(2deg) scale(1.04); }
+    }
+
+    @keyframes progressRun {
+      from { background-position: 0% 50%; }
+      to { background-position: 240% 50%; }
+    }
+
+    .question-view.active .question-kicker {
+      animation: popTag 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .question-view.active .question-title {
+      animation: titleKick 0.46s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes popTag {
+      from { opacity: 0; transform: translateY(10px) rotate(-2deg) scale(0.92); }
+      to { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+    }
+
+    @keyframes titleKick {
+      from { opacity: 0; transform: translateX(-16px) skewX(-4deg); }
+      to { opacity: 1; transform: translateX(0) skewX(0deg); }
     }
 
     .question-head {
@@ -210,6 +383,8 @@
       overflow: hidden;
       text-align: left;
       transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+      animation: cardIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-delay: var(--delay, 0s);
     }
 
     .option:hover,
@@ -218,6 +393,33 @@
       box-shadow: 8px 8px 0 rgba(23, 23, 23, 0.9);
       outline: none;
       filter: saturate(1.05);
+    }
+
+    .option.picked {
+      animation: pickedPunch 0.34s cubic-bezier(0.2, 1.35, 0.25, 1) both;
+      animation-delay: 0s;
+      filter: saturate(1.22) contrast(1.04);
+    }
+
+    .option.picked .meme-frame img {
+      animation: memeBounce 0.42s cubic-bezier(0.2, 1.35, 0.25, 1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(18px) rotate(1.6deg) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+    }
+
+    @keyframes pickedPunch {
+      0% { transform: translate(0, 0) scale(1); }
+      48% { transform: translate(-5px, -6px) rotate(-1.4deg) scale(1.04); }
+      100% { transform: translate(-2px, -2px) rotate(0.2deg) scale(1.01); }
+    }
+
+    @keyframes memeBounce {
+      0% { transform: scale(1) rotate(0deg); }
+      42% { transform: scale(1.1) rotate(-2deg); }
+      100% { transform: scale(1) rotate(0deg); }
     }
 
     .option[data-choice="A"] .badge,
@@ -377,6 +579,36 @@
 
     .poster {
       overflow: hidden;
+    }
+
+    .result-view.active .poster {
+      animation: posterSnap 0.58s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .result-view.active .score-card {
+      animation: scoreSlide 0.55s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .poster.celebrate .poster-sticker img,
+    .poster.celebrate .poster-emoji {
+      animation: resultWobble 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes posterSnap {
+      from { opacity: 0; transform: translateY(24px) rotate(-1deg) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+    }
+
+    @keyframes scoreSlide {
+      from { opacity: 0; transform: translateX(22px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes resultWobble {
+      0% { transform: scale(0.84) rotate(-6deg); }
+      38% { transform: scale(1.12) rotate(4deg); }
+      64% { transform: scale(0.98) rotate(-2deg); }
+      100% { transform: scale(1) rotate(0deg); }
     }
 
     .poster-media {
@@ -580,6 +812,93 @@
       transform: translate(-50%, 0);
     }
 
+    .fx-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .danmaku-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 4;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .danmaku-layer.active {
+      opacity: 1;
+    }
+
+    .danmaku {
+      position: fixed;
+      left: 100vw;
+      top: var(--top, 20vh);
+      padding: 7px 13px;
+      white-space: nowrap;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--ink);
+      font-weight: 900;
+      font-size: var(--font-size, 15px);
+      box-shadow: 3px 3px 0 rgba(23, 23, 23, 0.82);
+      transform: translateX(0);
+      animation: danmakuMove var(--duration, 8s) linear forwards;
+    }
+
+    .danmaku[data-tone="A"] { color: var(--a); }
+    .danmaku[data-tone="B"] { color: var(--b); }
+    .danmaku[data-tone="C"] { color: var(--c); }
+    .danmaku[data-tone="D"] { color: var(--d); }
+
+    body.is-result .danmaku {
+      opacity: 0.78;
+    }
+
+    @keyframes danmakuMove {
+      to { transform: translateX(calc(-100vw - 120%)); }
+    }
+
+    .spark {
+      position: fixed;
+      left: var(--x);
+      top: var(--y);
+      width: var(--size, 9px);
+      height: var(--size, 9px);
+      border: 2px solid var(--line);
+      border-radius: 3px;
+      background: var(--spark-color, var(--a));
+      box-shadow: 2px 2px 0 rgba(23, 23, 23, 0.18);
+      transform: translate(-50%, -50%);
+      animation: sparkFly 0.78s cubic-bezier(0.12, 0.72, 0.2, 1) forwards;
+    }
+
+    .spark:nth-child(3n) {
+      border-radius: 999px;
+    }
+
+    .spark:nth-child(4n) {
+      width: calc(var(--size, 9px) * 1.8);
+      height: calc(var(--size, 9px) * 0.55);
+    }
+
+    @keyframes sparkFly {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(0deg) scale(0.7);
+      }
+      72% { opacity: 1; }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)) scale(0.18);
+      }
+    }
+
     @media (max-width: 900px) {
       .option-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -643,6 +962,26 @@
       .answer-strip {
         grid-template-columns: repeat(4, minmax(0, 1fr));
       }
+
+      .home-view {
+        min-height: calc(100vh - 88px);
+      }
+
+      .home-content {
+        padding: 24px;
+      }
+
+      .home-title {
+        max-width: 330px;
+      }
+
+      .home-copy {
+        font-size: 15px;
+      }
+
+      .note {
+        display: none;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -657,7 +996,7 @@
     }
   </style>
 </head>
-<body>
+<body class="is-home">
   <div class="shell">
     <header class="topbar">
       <div class="brand">
@@ -684,7 +1023,28 @@
     </section>
 
     <main>
-      <section class="question-view active" id="questionView" aria-live="polite">
+      <section class="home-view active" id="homeView" aria-live="polite">
+        <div class="home-content">
+          <div class="home-kicker">当代大学生精神状态检测中心</div>
+          <h2 class="home-title">请尽情发疯</h2>
+          <p class="home-subtitle">系统会认真记录你的不正常。</p>
+          <p class="home-copy">这里不诊断、不评判、不劝你冷静。凭第一反应选择最像自己的表情包，系统将生成一份体面但离谱的人格报告。</p>
+          <div class="home-tags" aria-hidden="true">
+            <span>期末周备案</span>
+            <span>闹钟创伤</span>
+            <span>朋友圈刺激</span>
+            <span>深夜 emo 样本</span>
+          </div>
+          <button class="start-button" type="button" id="startQuiz">开始发疯</button>
+        </div>
+        <div class="home-stickers" aria-hidden="true">
+          <span class="note">已疯勿扰</span>
+          <span class="note">正常崩溃中</span>
+          <span class="note">情绪加载失败</span>
+        </div>
+      </section>
+
+      <section class="question-view" id="questionView" aria-live="polite">
         <div class="question-head">
           <div class="question-kicker" id="questionKicker">期末周精神鉴定</div>
           <h2 class="question-title" id="questionTitle"></h2>
@@ -718,7 +1078,6 @@
             <h3>选择轨迹</h3>
             <div class="answer-strip" id="answerStrip"></div>
             <div class="score-list" id="scoreList"></div>
-                        <div class="sources">表情包已内嵌在这个 HTML 文件里，部署时只需要上传这一份文件。</div>
           </aside>
         </div>
       </section>
@@ -732,47 +1091,49 @@
 
   <div class="toast" id="toast">已复制</div>
 
+  <div class="danmaku-layer" id="danmakuLayer" aria-hidden="true"></div>
+
   <script>
     const memeSets = {
       A: [
-        "assets/memes/q1/A.gif",
-        "assets/memes/q1/B.gif",
-        "assets/memes/q1/C.gif",
-        "assets/memes/q1/D.gif",
-        "assets/memes/q2/A.gif",
-        "assets/memes/q2/B.gif",
-        "assets/memes/q2/C.gif",
-        "assets/memes/q2/D.gif"
+        "assets/memes/pick/q1/A.gif",
+        "assets/memes/pick/q1/B.webp",
+        "assets/memes/pick/q1/C.gif",
+        "assets/memes/pick/q1/D.webp",
+        "assets/memes/pick/q2/A.gif",
+        "assets/memes/pick/q2/B.webp",
+        "assets/memes/pick/q2/C.gif",
+        "assets/memes/pick/q2/D.webp"
       ],
       B: [
-        "assets/memes/q3/A.gif",
-        "assets/memes/q3/B.gif",
-        "assets/memes/q3/C.gif",
-        "assets/memes/q3/D.gif",
-        "assets/memes/q4/A.gif",
-        "assets/memes/q4/B.gif",
-        "assets/memes/q4/C.gif",
-        "assets/memes/q4/D.gif"
+        "assets/memes/pick/q3/A.webp",
+        "assets/memes/pick/q3/B.webp",
+        "assets/memes/pick/q3/C.webp",
+        "assets/memes/pick/q3/D.webp",
+        "assets/memes/pick/q4/A.gif",
+        "assets/memes/pick/q4/B.webp",
+        "assets/memes/pick/q4/C.webp",
+        "assets/memes/pick/q4/D.gif"
       ],
       C: [
-        "assets/memes/q5/A.gif",
-        "assets/memes/q5/B.gif",
-        "assets/memes/q5/C.gif",
-        "assets/memes/q5/D.gif",
-        "assets/memes/q6/A.gif",
-        "assets/memes/q6/B.gif",
-        "assets/memes/q6/C.gif",
-        "assets/memes/q6/D.gif"
+        "assets/memes/pick/q5/A.gif",
+        "assets/memes/pick/q5/B.gif",
+        "assets/memes/pick/q5/C.webp",
+        "assets/memes/pick/q5/D.webp",
+        "assets/memes/pick/q6/A.gif",
+        "assets/memes/pick/q6/B.webp",
+        "assets/memes/pick/q6/C.gif",
+        "assets/memes/pick/q6/D.webp"
       ],
       D: [
-        "assets/memes/q7/A.gif",
-        "assets/memes/q7/B.gif",
-        "assets/memes/q7/C.gif",
-        "assets/memes/q7/D.gif",
-        "assets/memes/q8/A.gif",
-        "assets/memes/q8/B.gif",
-        "assets/memes/q8/C.gif",
-        "assets/memes/q8/D.gif"
+        "assets/memes/pick/q7/A.gif",
+        "assets/memes/pick/q7/B.gif",
+        "assets/memes/pick/q7/C.gif",
+        "assets/memes/pick/q7/D.gif",
+        "assets/memes/pick/q8/A.gif",
+        "assets/memes/pick/q8/B.gif",
+        "assets/memes/pick/q8/C.gif",
+        "assets/memes/pick/q8/D.webp"
       ]
     };
 
@@ -913,9 +1274,11 @@
 
     const state = {
       index: 0,
-      answers: Array(questions.length).fill(null)
+      answers: Array(questions.length).fill(null),
+      locked: false
     };
 
+    const homeView = document.getElementById("homeView");
     const questionView = document.getElementById("questionView");
     const resultView = document.getElementById("resultView");
     const questionKicker = document.getElementById("questionKicker");
@@ -935,6 +1298,7 @@
     const answerStrip = document.getElementById("answerStrip");
     const scoreList = document.getElementById("scoreList");
     const toast = document.getElementById("toast");
+    const danmakuLayer = document.getElementById("danmakuLayer");
 
     function getScores() {
       return state.answers.reduce((scores, answer) => {
@@ -943,15 +1307,105 @@
       }, { A: 0, B: 0, C: 0, D: 0 });
     }
 
+    const homeDanmaku = [
+      "已疯勿扰",
+      "今天也在正常崩溃",
+      "情绪加载失败",
+      "卷不动了",
+      "先笑一下再说",
+      "我的精神状态很好，装的",
+      "活着就行",
+      "期末周限定发疯",
+      "别问，问就是稳定发疯",
+      "正在加载体面"
+    ];
+
+    const resultDanmaku = [
+      "鉴定完毕",
+      "这很合理",
+      "精神状态领先版本",
+      "建议立刻截图",
+      "发疯但体面",
+      "报告已生成",
+      "离谱但准确",
+      "今天也辛苦了"
+    ];
+
+    let danmakuTimer = null;
+    let danmakuTimeouts = [];
+    let danmakuLane = 0;
+
+    function createDanmaku(text, mode = "home") {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const item = document.createElement("span");
+      const tones = ["A", "B", "C", "D"];
+      const lanes = mode === "result" ? [12, 20, 78, 86] : [16, 24, 32, 40, 52, 64, 74];
+      const laneTop = lanes[danmakuLane % lanes.length] + (Math.random() * 3 - 1.5);
+      danmakuLane += 1;
+      item.className = "danmaku";
+      item.dataset.tone = tones[Math.floor(Math.random() * tones.length)];
+      item.textContent = text;
+      item.style.setProperty("--top", `${laneTop}vh`);
+      item.style.setProperty("--duration", `${mode === "result" ? 4.8 + Math.random() * 1.6 : 7 + Math.random() * 3}s`);
+      item.style.setProperty("--font-size", `${mode === "result" ? 16 + Math.random() * 4 : 14 + Math.random() * 3}px`);
+      danmakuLayer.append(item);
+      item.addEventListener("animationend", () => item.remove(), { once: true });
+    }
+
+    function startHomeDanmaku() {
+      stopDanmaku();
+      danmakuLayer.classList.add("active");
+      homeDanmaku.slice(0, 4).forEach((text, index) => {
+        danmakuTimeouts.push(window.setTimeout(() => createDanmaku(text, "home"), index * 420));
+      });
+      danmakuTimer = window.setInterval(() => {
+        createDanmaku(homeDanmaku[Math.floor(Math.random() * homeDanmaku.length)], "home");
+      }, 1450);
+    }
+
+    function stopDanmaku() {
+      window.clearInterval(danmakuTimer);
+      danmakuTimeouts.forEach((timer) => window.clearTimeout(timer));
+      danmakuTimeouts = [];
+      danmakuTimer = null;
+      danmakuLayer.classList.remove("active");
+      danmakuLayer.innerHTML = "";
+    }
+
+    function fireResultDanmaku() {
+      stopDanmaku();
+      if (window.innerWidth < 700) return;
+      danmakuLayer.classList.add("active");
+      resultDanmaku.forEach((text, index) => {
+        danmakuTimeouts.push(window.setTimeout(() => createDanmaku(text, "result"), index * 180));
+      });
+      danmakuTimeouts.push(window.setTimeout(() => {
+        if (document.body.classList.contains("is-result")) {
+          danmakuLayer.classList.remove("active");
+        }
+      }, 5200));
+    }
+
+    function startQuiz() {
+      stopDanmaku();
+      document.body.classList.remove("is-home", "is-result");
+      homeView.classList.remove("active");
+      resultView.classList.remove("active");
+      questionView.classList.add("active");
+      renderQuestion();
+      burstAt(window.innerWidth / 2, Math.min(window.innerHeight * 0.42, 360), "D", 34);
+    }
+
     function renderQuestion() {
       const item = questions[state.index];
       questionKicker.textContent = item.kicker;
       questionTitle.textContent = item.title;
       optionGrid.innerHTML = "";
 
-      ["A", "B", "C", "D"].forEach((choice) => {
+      ["A", "B", "C", "D"].forEach((choice, choiceIndex) => {
         const option = document.createElement("button");
         option.className = "option";
+        option.style.setProperty("--delay", `${choiceIndex * 0.055}s`);
         option.type = "button";
         option.dataset.choice = choice;
         option.setAttribute("aria-label", `${choice}：${item.options[choice][0]}`);
@@ -969,7 +1423,7 @@
         option.querySelector("img").addEventListener("error", () => {
           option.classList.add("image-missing");
         }, { once: true });
-        option.addEventListener("click", () => choose(choice));
+        option.addEventListener("click", () => choose(choice, option));
         optionGrid.append(option);
       });
 
@@ -994,14 +1448,68 @@
       });
     }
 
-    function choose(choice) {
-      state.answers[state.index] = choice;
-      if (state.index < questions.length - 1) {
-        state.index += 1;
-        renderQuestion();
-      } else {
-        showResult();
+    function colorForChoice(choice) {
+      return choice === "A" ? "#e94b5f"
+        : choice === "B" ? "#16a085"
+        : choice === "C" ? "#3f7ac9"
+        : "#f0a323";
+    }
+
+    function getFxLayer() {
+      let layer = document.getElementById("fxLayer");
+      if (!layer) {
+        layer = document.createElement("div");
+        layer.className = "fx-layer";
+        layer.id = "fxLayer";
+        layer.setAttribute("aria-hidden", "true");
+        document.body.append(layer);
       }
+      return layer;
+    }
+
+    function burstAt(x, y, choice = "D", amount = 18) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const layer = getFxLayer();
+      const colors = [colorForChoice(choice), "#ffffff", "#171717", "#f0a323", "#3f7ac9"];
+      for (let i = 0; i < amount; i += 1) {
+        const spark = document.createElement("span");
+        const angle = (Math.PI * 2 * i) / amount + Math.random() * 0.42;
+        const distance = 42 + Math.random() * 86;
+        spark.className = "spark";
+        spark.style.setProperty("--x", `${x}px`);
+        spark.style.setProperty("--y", `${y}px`);
+        spark.style.setProperty("--dx", `${Math.cos(angle) * distance}px`);
+        spark.style.setProperty("--dy", `${Math.sin(angle) * distance}px`);
+        spark.style.setProperty("--rot", `${Math.floor(Math.random() * 520 - 260)}deg`);
+        spark.style.setProperty("--size", `${6 + Math.random() * 8}px`);
+        spark.style.setProperty("--spark-color", colors[i % colors.length]);
+        layer.append(spark);
+        spark.addEventListener("animationend", () => spark.remove(), { once: true });
+      }
+    }
+
+    function burstFromElement(element, choice, amount) {
+      const rect = element.getBoundingClientRect();
+      burstAt(rect.left + rect.width / 2, rect.top + rect.height / 2, choice, amount);
+    }
+
+    function choose(choice, optionElement) {
+      if (state.locked) return;
+      state.locked = true;
+      state.answers[state.index] = choice;
+      if (optionElement) {
+        optionElement.classList.add("picked");
+        burstFromElement(optionElement, choice, 18);
+      }
+      window.setTimeout(() => {
+        if (state.index < questions.length - 1) {
+          state.index += 1;
+          renderQuestion();
+        } else {
+          showResult();
+        }
+        state.locked = false;
+      }, 260);
     }
 
     function calculateResult() {
@@ -1014,6 +1522,9 @@
     function showResult() {
       const { scores, winners, resultKey } = calculateResult();
       const result = results[resultKey];
+      document.body.classList.remove("is-home");
+      document.body.classList.add("is-result");
+      homeView.classList.remove("active");
       questionView.classList.remove("active");
       resultView.classList.add("active");
       resultTitle.textContent = result.title;
@@ -1024,13 +1535,18 @@
       resultImage.src = result.image;
       resultImage.alt = result.title;
       resultEmoji.textContent = result.emoji;
-      poster.classList.remove("image-missing");
+      poster.classList.remove("image-missing", "celebrate");
       resultImage.onerror = () => poster.classList.add("image-missing");
       renderScores(scores);
       updateChrome();
       progressText.textContent = "测试结果";
       progressBar.style.width = "100%";
       prevBtn.disabled = true;
+      window.setTimeout(() => {
+        poster.classList.add("celebrate");
+        burstAt(window.innerWidth / 2, Math.min(window.innerHeight * 0.38, 360), resultKey === "MIX" ? "D" : resultKey, 44);
+        fireResultDanmaku();
+      }, 180);
     }
 
     function renderScores(scores) {
@@ -1063,11 +1579,17 @@
     }
 
     function restart() {
+      state.locked = false;
       state.index = 0;
       state.answers = Array(questions.length).fill(null);
+      document.body.classList.add("is-home");
+      document.body.classList.remove("is-result");
       resultView.classList.remove("active");
-      questionView.classList.add("active");
+      questionView.classList.remove("active");
+      homeView.classList.add("active");
+      progressBar.style.width = "0%";
       renderQuestion();
+      startHomeDanmaku();
     }
 
     function showToast(message) {
@@ -1090,11 +1612,13 @@
     }
 
     prevBtn.addEventListener("click", goBack);
+    document.getElementById("startQuiz").addEventListener("click", startQuiz);
     document.getElementById("restartTop").addEventListener("click", restart);
     document.getElementById("restartResult").addEventListener("click", restart);
     document.getElementById("copyResult").addEventListener("click", copyResult);
 
     renderQuestion();
+    startHomeDanmaku();
   </script>
 </body>
 </html>
