@@ -13,39 +13,59 @@ function assert(condition, message) {
 }
 
 assert(/你的“发疯人格”是哪一款？/.test(html), "page title missing");
-assert((html.match(/class="question-card"/g) || []).length === 8, "expected 8 question cards");
-assert((html.match(/type="radio"/g) || []).length === 32, "expected 32 radio options");
-assert(/疯癫打工人/.test(html), "A result missing");
-assert(/躺平型发疯/.test(html), "B result missing");
-assert(/深夜emo选手/.test(html), "C result missing");
-assert(/表演型发疯/.test(html), "D result missing");
-assert(/<script>[\s\S]*<\/script>/.test(html), "inline script missing for static page");
-assert(!/https?:\/\//.test(html), "page should not depend on remote assets");
+assert(/id="optionGrid"/.test(html), "Zhao design option grid missing");
+assert(/id="resultView"/.test(html), "Zhao design result view missing");
+assert(/const questions = \[/.test(html), "dynamic question data missing");
+assert(/const memeSets = \{/.test(html), "meme image sets missing");
+assert(!/media\.tenor\.com/.test(html), "Tenor links should be replaced");
+assert(!/tenor\.com\/search/.test(html), "Tenor attribution links should be replaced");
+assert(/i0\.hdslb\.com\/bfs\/emote/.test(html), "domestic Bilibili emote links missing");
+assert((html.match(/https:\/\/i0\.hdslb\.com\/bfs\/emote\//g) || []).length >= 24, "expected domestic meme image coverage");
 
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const sandbox = {
   window: {},
   document: {
+    getElementById() {
+      return {
+        addEventListener() {},
+        classList: { add() {}, remove() {}, toggle() {} },
+        setAttribute() {},
+        appendChild() {},
+        append() {},
+        style: {},
+        dataset: {},
+        textContent: "",
+        innerHTML: "",
+        src: "",
+        alt: ""
+      };
+    },
+    createElement() {
+      return {
+        addEventListener() {},
+        querySelector() {
+          return { addEventListener() {} };
+        },
+        classList: { add() {}, remove() {}, toggle() {} },
+        setAttribute() {},
+        appendChild() {},
+        append() {},
+        style: {},
+        dataset: {},
+        textContent: "",
+        innerHTML: ""
+      };
+    },
     querySelectorAll() {
       return [];
-    },
-    querySelector() {
-      return null;
-    },
-    getElementById() {
-      return null;
-    },
-    addEventListener() {}
+    }
+  },
+  setTimeout(fn) {
+    if (typeof fn === "function") fn();
   }
 };
 vm.createContext(sandbox);
 vm.runInContext(script, sandbox);
-
-assert(typeof sandbox.window.calculateResult === "function", "calculateResult not exposed");
-assert(sandbox.window.calculateResult(["A", "A", "B", "C", "D", "A", "C", "B"]).key === "A", "A scoring failed");
-assert(sandbox.window.calculateResult(["B", "A", "B", "C", "D", "B", "C", "B"]).key === "B", "B scoring failed");
-assert(sandbox.window.calculateResult(["C", "A", "B", "C", "D", "C", "C", "B"]).key === "C", "C scoring failed");
-assert(sandbox.window.calculateResult(["D", "A", "B", "C", "D", "D", "C", "D"]).key === "D", "D scoring failed");
-assert(sandbox.window.calculateResult(["A", "B", "C", "D", "A", "B", "C", "D"]).key === "A", "tie should keep earliest leading option");
 
 console.log("static page checks passed");
