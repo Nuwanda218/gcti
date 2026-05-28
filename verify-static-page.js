@@ -4,7 +4,9 @@ const vm = require("vm");
 
 const root = __dirname;
 const htmlPath = path.join(root, "index.html");
+const readmePath = path.join(root, "README.md");
 const html = fs.readFileSync(htmlPath, "utf8");
+const readme = fs.readFileSync(readmePath, "utf8");
 
 function assert(condition, message) {
   if (!condition) {
@@ -19,8 +21,13 @@ assert(/const questions = \[/.test(html), "dynamic question data missing");
 assert(/const memeSets = \{/.test(html), "meme image sets missing");
 assert(!/media\.tenor\.com/.test(html), "Tenor links should be replaced");
 assert(!/tenor\.com\/search/.test(html), "Tenor attribution links should be replaced");
-assert(/i0\.hdslb\.com\/bfs\/emote/.test(html), "domestic Bilibili emote links missing");
-assert((html.match(/https:\/\/i0\.hdslb\.com\/bfs\/emote\//g) || []).length >= 24, "expected domestic meme image coverage");
+assert(/data:image\//.test(html) || /i0\.hdslb\.com\/bfs\/emote/.test(html), "usable meme image sources missing");
+for (let question = 1; question <= 8; question += 1) {
+  assert(fs.existsSync(path.join(root, "assets", "memes", `q${question}`)), `q${question} meme directory missing`);
+}
+assert(fs.existsSync(path.join(root, "assets", "memes", "results")), "result meme directory missing");
+assert(/assets\/memes\/q\[题号\]\/\[选项\]\.png/.test(readme), "README question naming rule missing");
+assert(/assets\/memes\/results\/\[人格选项\]\.png/.test(readme), "README result naming rule missing");
 
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const sandbox = {

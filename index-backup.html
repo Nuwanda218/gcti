@@ -1,0 +1,1161 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>你的发疯人格是哪一款？</title>
+  <meta name="description" content="一个适合课堂展示的表情包人格测试。" />
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #171717;
+      --muted: #686b72;
+      --paper: #fffaf2;
+      --panel: #ffffff;
+      --line: #222222;
+      --a: #e94b5f;
+      --b: #16a085;
+      --c: #3f7ac9;
+      --d: #f0a323;
+      --shadow: 0 14px 30px rgba(26, 26, 26, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", system-ui, sans-serif;
+      background:
+        linear-gradient(90deg, rgba(23, 23, 23, 0.045) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(23, 23, 23, 0.045) 1px, transparent 1px),
+        var(--paper);
+      background-size: 28px 28px;
+      letter-spacing: 0;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 28px));
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 22px 0 28px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 16px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .stamp {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      background: var(--ink);
+      color: #fff;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      box-shadow: 4px 4px 0 #f0a323;
+      transform: rotate(-3deg);
+      flex: 0 0 auto;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(21px, 4vw, 36px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .restart {
+      min-width: 44px;
+      height: 44px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      box-shadow: 4px 4px 0 rgba(23, 23, 23, 0.9);
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .restart:hover,
+    .restart:focus-visible {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 rgba(23, 23, 23, 0.9);
+      outline: none;
+    }
+
+    .progress-wrap {
+      display: grid;
+      gap: 8px;
+    }
+
+    .progress-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .bar {
+      height: 12px;
+      overflow: hidden;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+    }
+
+    .bar > span {
+      display: block;
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--a), var(--b), var(--c), var(--d));
+      transition: width 0.28s ease;
+    }
+
+    main {
+      display: grid;
+      align-items: center;
+    }
+
+    .question-view,
+    .result-view {
+      display: none;
+    }
+
+    .question-view.active,
+    .result-view.active {
+      display: grid;
+      animation: rise 0.22s ease both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-head {
+      display: grid;
+      gap: 10px;
+      margin: 10px 0 18px;
+    }
+
+    .question-kicker {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .question-title {
+      margin: 0;
+      font-size: clamp(24px, 5vw, 44px);
+      line-height: 1.12;
+      max-width: 900px;
+      letter-spacing: 0;
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .option {
+      position: relative;
+      min-height: 0;
+      padding: 0;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 5px 5px 0 rgba(23, 23, 23, 0.9);
+      cursor: pointer;
+      overflow: hidden;
+      text-align: left;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+    }
+
+    .option:hover,
+    .option:focus-visible {
+      transform: translate(-3px, -3px) rotate(-0.5deg);
+      box-shadow: 8px 8px 0 rgba(23, 23, 23, 0.9);
+      outline: none;
+      filter: saturate(1.05);
+    }
+
+    .option[data-choice="A"] .badge,
+    .score-row[data-choice="A"] .score-fill {
+      background: var(--a);
+    }
+
+    .option[data-choice="B"] .badge,
+    .score-row[data-choice="B"] .score-fill {
+      background: var(--b);
+    }
+
+    .option[data-choice="C"] .badge,
+    .score-row[data-choice="C"] .score-fill {
+      background: var(--c);
+    }
+
+    .option[data-choice="D"] .badge,
+    .score-row[data-choice="D"] .score-fill {
+      background: var(--d);
+    }
+
+    .meme-frame {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.72)),
+        repeating-linear-gradient(45deg, rgba(23, 23, 23, 0.05) 0 7px, transparent 7px 14px);
+      border-bottom: 2px solid var(--line);
+    }
+
+    .meme-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .fallback {
+      display: none;
+      font-size: clamp(58px, 13vw, 110px);
+      line-height: 1;
+      filter: drop-shadow(4px 5px 0 rgba(23, 23, 23, 0.16));
+    }
+
+    .option.image-missing img {
+      display: none;
+    }
+
+    .option.image-missing .fallback {
+      display: block;
+    }
+
+    .badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: grid;
+      place-items: center;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 8px;
+      color: #fff;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      font-weight: 900;
+      box-shadow: 2px 2px 0 #fff;
+    }
+
+    .option-copy {
+      min-height: 112px;
+      padding: 12px 13px 14px;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .option-copy strong {
+      font-size: 15px;
+      line-height: 1.26;
+    }
+
+    .option-copy span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.42;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 48px;
+    }
+
+    .ghost {
+      height: 42px;
+      padding: 0 15px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 rgba(23, 23, 23, 0.85);
+    }
+
+    .ghost:disabled {
+      opacity: 0.4;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .pips {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pip {
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+    }
+
+    .pip.done {
+      background: var(--ink);
+    }
+
+    .result-view {
+      align-items: center;
+    }
+
+    .result-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(320px, 0.98fr);
+      gap: 18px;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    .poster,
+    .score-card {
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .poster {
+      overflow: hidden;
+    }
+
+    .poster-media {
+      min-height: 310px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background:
+        linear-gradient(110deg, rgba(233, 75, 95, 0.18), rgba(22, 160, 133, 0.2), rgba(240, 163, 35, 0.22)),
+        #fff;
+      border-bottom: 2px solid var(--line);
+    }
+
+    .poster-sticker {
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      border-right: 2px solid var(--line);
+      min-height: 300px;
+    }
+
+    .poster-sticker img {
+      max-width: min(100%, 300px);
+      max-height: 290px;
+      object-fit: contain;
+      filter: drop-shadow(6px 8px 0 rgba(23, 23, 23, 0.13));
+    }
+
+    .poster-sticker .poster-emoji {
+      display: none;
+      font-size: 118px;
+    }
+
+    .poster.image-missing .poster-sticker img {
+      display: none;
+    }
+
+    .poster.image-missing .poster-emoji {
+      display: block;
+    }
+
+    .poster-title {
+      padding: 24px;
+      display: grid;
+      align-content: center;
+      gap: 12px;
+    }
+
+    .poster-title .tag {
+      width: fit-content;
+      padding: 6px 10px;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .poster-title h2 {
+      margin: 0;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .poster-body {
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .poster-body p {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.72;
+    }
+
+    .result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .primary,
+    .secondary {
+      height: 44px;
+      padding: 0 16px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 900;
+      box-shadow: 4px 4px 0 rgba(23, 23, 23, 0.9);
+    }
+
+    .primary {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .secondary {
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .score-card {
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .score-card h3 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .score-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .score-row {
+      display: grid;
+      gap: 6px;
+    }
+
+    .score-row header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .score-track {
+      height: 16px;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .score-fill {
+      height: 100%;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .answer-strip {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .answer-chip {
+      min-height: 42px;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      font-weight: 900;
+    }
+
+    .answer-chip[data-choice="A"] { color: var(--a); }
+    .answer-chip[data-choice="B"] { color: var(--b); }
+    .answer-chip[data-choice="C"] { color: var(--c); }
+    .answer-chip[data-choice="D"] { color: var(--d); }
+
+    .sources {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .sources a {
+      color: inherit;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      z-index: 10;
+      padding: 10px 14px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 800;
+      box-shadow: 4px 4px 0 rgba(23, 23, 23, 0.9);
+      transform: translate(-50%, 18px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 900px) {
+      .option-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .result-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .shell {
+        width: min(100% - 20px, 1120px);
+        padding-top: 14px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .brand p {
+        display: none;
+      }
+
+      .option-grid {
+        grid-template-columns: 1fr;
+        gap: 11px;
+      }
+
+      .option {
+        display: grid;
+        grid-template-columns: 126px minmax(0, 1fr);
+      }
+
+      .meme-frame {
+        aspect-ratio: auto;
+        min-height: 126px;
+        border-right: 2px solid var(--line);
+        border-bottom: 0;
+      }
+
+      .option-copy {
+        min-height: 126px;
+        padding: 13px;
+      }
+
+      .poster-media {
+        grid-template-columns: 1fr;
+      }
+
+      .poster-sticker {
+        min-height: 230px;
+        border-right: 0;
+        border-bottom: 2px solid var(--line);
+      }
+
+      .poster-sticker img {
+        max-height: 210px;
+      }
+
+      .answer-strip {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="stamp" aria-hidden="true">疯</div>
+        <div>
+          <h1>你的“发疯人格”是哪一款？</h1>
+          <p>毛概展示课 · 表情包人格测试</p>
+        </div>
+      </div>
+      <button class="restart" type="button" id="restartTop" title="重新开始" aria-label="重新开始">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3 12a9 9 0 1 0 3-6.7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M3 4v6h6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <section class="progress-wrap" aria-label="进度">
+      <div class="progress-meta">
+        <span id="progressText">第 1 / 8 题</span>
+        <span id="scoreHint">A0 · B0 · C0 · D0</span>
+      </div>
+      <div class="bar" aria-hidden="true"><span id="progressBar"></span></div>
+    </section>
+
+    <main>
+      <section class="question-view active" id="questionView" aria-live="polite">
+        <div class="question-head">
+          <div class="question-kicker" id="questionKicker">期末周精神鉴定</div>
+          <h2 class="question-title" id="questionTitle"></h2>
+        </div>
+        <div class="option-grid" id="optionGrid"></div>
+      </section>
+
+      <section class="result-view" id="resultView" aria-live="polite">
+        <div class="result-layout">
+          <article class="poster" id="poster">
+            <div class="poster-media">
+              <div class="poster-sticker">
+                <img id="resultImage" alt="" />
+                <div class="poster-emoji" id="resultEmoji" aria-hidden="true">🤯</div>
+              </div>
+              <div class="poster-title">
+                <div class="tag" id="resultTag">测试结果</div>
+                <h2 id="resultTitle"></h2>
+              </div>
+            </div>
+            <div class="poster-body">
+              <p id="resultDescription"></p>
+              <div class="result-actions">
+                <button class="primary" type="button" id="copyResult">复制结果</button>
+                <button class="secondary" type="button" id="restartResult">重新测试</button>
+              </div>
+            </div>
+          </article>
+
+          <aside class="score-card">
+            <h3>选择轨迹</h3>
+            <div class="answer-strip" id="answerStrip"></div>
+            <div class="score-list" id="scoreList"></div>
+            <div class="sources">
+              表情包素材来自
+              <a href="https://www.bilibili.com" target="_blank" rel="noreferrer">Bilibili 表情 CDN</a>。
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <nav class="nav" aria-label="答题导航">
+      <button class="ghost" type="button" id="prevBtn">上一题</button>
+      <div class="pips" id="pips" aria-hidden="true"></div>
+    </nav>
+  </div>
+
+  <div class="toast" id="toast">已复制</div>
+
+  <script>
+    const localMemeSets = {
+      A: [
+        "assets/memes/q1/A.png",
+        "assets/memes/q2/A.png",
+        "assets/memes/q3/A.png",
+        "assets/memes/q4/A.png",
+        "assets/memes/q5/A.png",
+        "assets/memes/q6/A.png",
+        "assets/memes/q7/A.png",
+        "assets/memes/q8/A.png"
+      ],
+      B: [
+        "assets/memes/q1/B.png",
+        "assets/memes/q2/B.png",
+        "assets/memes/q3/B.png",
+        "assets/memes/q4/B.png",
+        "assets/memes/q5/B.png",
+        "assets/memes/q6/B.png",
+        "assets/memes/q7/B.png",
+        "assets/memes/q8/B.png"
+      ],
+      C: [
+        "assets/memes/q1/C.png",
+        "assets/memes/q2/C.png",
+        "assets/memes/q3/C.png",
+        "assets/memes/q4/C.png",
+        "assets/memes/q5/C.png",
+        "assets/memes/q6/C.png",
+        "assets/memes/q7/C.png",
+        "assets/memes/q8/C.png"
+      ],
+      D: [
+        "assets/memes/q1/D.png",
+        "assets/memes/q2/D.png",
+        "assets/memes/q3/D.png",
+        "assets/memes/q4/D.png",
+        "assets/memes/q5/D.png",
+        "assets/memes/q6/D.png",
+        "assets/memes/q7/D.png",
+        "assets/memes/q8/D.png"
+      ]
+    };
+
+    const memeSets = {
+      A: [
+        "https://i0.hdslb.com/bfs/emote/142409b595982b8210b2958f3d340f3b47942645.png",
+        "https://i0.hdslb.com/bfs/emote/6ea59c827c414b4a2955fe79e0f6fd3dcd515e24.png",
+        "https://i0.hdslb.com/bfs/emote/a0393a2d4b522f07a319dfd2e91754a3cdff2c48.png",
+        "https://i0.hdslb.com/bfs/emote/02ea49543a3ac52feee185c156ab08fb2bfdd89e.png",
+        "https://i0.hdslb.com/bfs/emote/5cf5e14101be845233a222ab1bbdc21c63af04c3.png",
+        "https://i0.hdslb.com/bfs/emote/718e9495846db4172eb87d2f7f02015a34d35ea2.png",
+        "https://i0.hdslb.com/bfs/emote/81edf17314cea3b48674312b4364df44d5c01f17.png",
+        "https://i0.hdslb.com/bfs/emote/685612eadc33f6bc233776c6241813385844f182.png"
+      ],
+      B: [
+        "https://i0.hdslb.com/bfs/emote/b9cbc755c2b3ee43be07ca13de84e5b699a3f101.png",
+        "https://i0.hdslb.com/bfs/emote/180129b8ea851044ce71caf55cc8ce44bd4a4fc8.png",
+        "https://i0.hdslb.com/bfs/emote/55f8f6445ca7c3170cdfc5b16036abf639ce9b57.png",
+        "https://i0.hdslb.com/bfs/emote/dbc177d314231add509501ffc6bc7655fca2c10f.png",
+        "https://i0.hdslb.com/bfs/emote/e3907b3bb20b18e7ecb11cd86829c9a4ce5b1b2f.png",
+        "https://i0.hdslb.com/bfs/emote/e92276d9d8c28f85f7dbcc0fbbb6ecb3345ce33e.png",
+        "https://i0.hdslb.com/bfs/emote/a8111ad55953ef5e3be3327ef94eb4a39d535d06.png",
+        "https://i0.hdslb.com/bfs/emote/bb690d4107620f1c15cff29509db529a73aee261.png"
+      ],
+      C: [
+        "https://i0.hdslb.com/bfs/emote/bba3703ab90b7d16fe9dbcb85ed949db687f8331.png",
+        "https://i0.hdslb.com/bfs/emote/3f757b147b9b1e201470eae7dac9cc0360172569.png",
+        "https://i0.hdslb.com/bfs/emote/49830c1c8a1652f7ee9cb854ac7dbf8e378cdcd6.png",
+        "https://i0.hdslb.com/bfs/emote/5e967cf1669743ed92e9a8ff3e5de6d90ca63d3d.png",
+        "https://i0.hdslb.com/bfs/emote/ab7a543233eff83138c3221c86a762ab36bab7bc.png",
+        "https://i0.hdslb.com/bfs/emote/9fdc2c5b4b970aded56fe2f326bd4d00e849339d.png",
+        "https://i0.hdslb.com/bfs/emote/dce6fc7d6dfeafff01241924db60f8251cca5307.png",
+        "https://i0.hdslb.com/bfs/emote/3ad2f66b151496d2a5fb0a8ea75f32265d778dd3.png"
+      ],
+      D: [
+        "https://i0.hdslb.com/bfs/emote/a8057c0e0579b93c16010a270e261fd0a64034af.png",
+        "https://i0.hdslb.com/bfs/emote/9e6ba9ff34101e04d3e321cad486f845f892050e.png",
+        "https://i0.hdslb.com/bfs/emote/7663b729161bd4556c2ec318c07791000743eb56.png",
+        "https://i0.hdslb.com/bfs/emote/eb966aaa5b690d3f9308a9f936f5b5a72a7f956b.png",
+        "https://i0.hdslb.com/bfs/emote/6c0d2e6c486d1ba5afd6204a96e102652464a01d.png",
+        "https://i0.hdslb.com/bfs/emote/4191ce3c44c2b3df8fd97c33f85d3ab15f4f3c84.png",
+        "https://i0.hdslb.com/bfs/emote/bba7c12aa51fed0199c241465560dfc2714c593e.png",
+        "https://i0.hdslb.com/bfs/emote/35d62c496d1e4ea9e091243fa812866f5fecc101.png"
+      ]
+    };
+
+    const fallbacks = {
+      A: "😵‍💫",
+      B: "😴",
+      C: "😭",
+      D: "🤡"
+    };
+
+    const questions = [
+      {
+        kicker: "期末周精神鉴定",
+        title: "期末周的你，更像以下哪种状态？",
+        options: {
+          A: ["知识不进脑子，但还在硬背", "脑子：拒收。手：继续抄。"],
+          B: ["已躺平，主打一个陪伴", "书可以不看，但人必须在场。"],
+          C: ["边哭边写，咖啡续命", "眼泪和咖啡，一起维持系统运行。"],
+          D: ["表面淡定，内心已疯", "微笑只是加载失败的保护色。"]
+        }
+      },
+      {
+        kicker: "闹钟事故现场",
+        title: "早上闹钟响了三次，你的第一反应是？",
+        options: {
+          A: ["立刻起床：再睡就来不及了", "肉体先启动，灵魂路上追。"],
+          B: ["和被窝谈判：再睡五分钟", "五分钟，是人类最后的尊严。"],
+          C: ["直接请假/逃课", "今天先与世界断开连接。"],
+          D: ["发动态：我和被窝是战略合作伙伴关系", "严肃声明：被窝方强烈挽留本人。"]
+        }
+      },
+      {
+        kicker: "卷王目击报告",
+        title: "看到别人拿奖学金/保研/大厂 offer，你内心？",
+        options: {
+          A: ["焦虑，然后逼自己学习", "焦虑是闹钟，响了就开工。"],
+          B: ["无所谓，与我无关", "别人的人生，不占我的内存。"],
+          C: ["嫉妒但不说", "点赞很轻，心碎很响。"],
+          D: ["发疯：卷不动了，我自愿沦为人类观察员", "从此转职：旁观型NPC。"]
+        }
+      },
+      {
+        kicker: "情绪维修站",
+        title: "当你很难受但没人可以说的时候，你会？",
+        options: {
+          A: ["找朋友聊聊", "求救信号发出，等待友军支援。"],
+          B: ["自己憋着", "情绪先存在草稿箱。"],
+          C: ["写日记/备忘录", "备忘录知道我所有破防瞬间。"],
+          D: ["发一条：已疯，勿扰，精神状态美丽得像假的", "用句号结束今天的体面。"]
+        }
+      },
+      {
+        kicker: "亲戚连环问",
+        title: "你妈/亲戚发消息问你“学习怎么样？有没有谈恋爱？”，你会？",
+        options: {
+          A: ["认真回答，报喜不报忧", "把生活修成家长可见版。"],
+          B: ["敷衍回一句“挺好的”然后消失", "两个字，完成防守反击。"],
+          C: ["感到压力巨大，但不知道怎么说", "输入框里打了删，删了打。"],
+          D: ["发“已死勿扰”，再说本人已皈依佛门", "这届年轻人的社交禅修。"]
+        }
+      },
+      {
+        kicker: "自由日悖论",
+        title: "如果你有一整天完全自由的时间，没有任何任务，你会？",
+        options: {
+          A: ["补之前落下的学习/工作", "自由，就是换个地方补债。"],
+          B: ["躺着刷手机，哪也不去", "今日安排：与天花板深度会谈。"],
+          C: ["既想放松又觉得愧疚，最后啥也没干成", "CPU 占用 100%，产出 0%。"],
+          D: ["发朋友圈：终于有空发疯了", "今日限定：全世界最快乐的精神状态。"]
+        }
+      },
+      {
+        kicker: "朋友圈滤镜冲击",
+        title: "打开社交媒体，发现所有人都在晒旅游/美食/演唱会，你会？",
+        options: {
+          A: ["觉得别人好精彩，自己好失败", "别人是 vlog，我是缓冲中。"],
+          B: ["直接划走，不看就不焦虑", "退出比较，保住心情。"],
+          C: ["默默点赞，然后陷入 emo", "手指很礼貌，心里在下雨。"],
+          D: ["评论：你的生活我的梦，我的生活狗都嫌.jpg", "以幽默之名，行破防之实。"]
+        }
+      },
+      {
+        kicker: "人生状态总结",
+        title: "如果让你用一句话形容你目前的人生状态，你会选？",
+        options: {
+          A: ["痛并努力着", "苦是苦，但进度条还在走。"],
+          B: ["活着就行，别的随缘", "人生 KPI：在线。"],
+          C: ["一边崩溃一边自愈", "今天裂开，明天补丁更新。"],
+          D: ["我是喜剧人，演的是悲剧，大家看的是笑话", "人生舞台，谢幕前继续整活。"]
+        }
+      }
+    ];
+
+    const localResultImages = {
+      A: "assets/memes/results/A.png",
+      B: "assets/memes/results/B.png",
+      C: "assets/memes/results/C.png",
+      D: "assets/memes/results/D.png",
+      MIX: "assets/memes/results/MIX.png"
+    };
+
+    const results = {
+      A: {
+        title: "疯癫打工人",
+        tag: "A 最多",
+        emoji: "😵‍💫",
+        image: memeSets.A[0],
+        description: "你是典型的“表面正常，内心已疯”。你会一边崩溃一边把事情做完，嘴上说着“毁灭吧”，手却没停过。发疯对你来说，是情绪的泄压阀，不是摆烂的借口。注意别把自己烧干了，偶尔也要真的休息一下。"
+      },
+      B: {
+        title: "躺平型发疯",
+        tag: "B 最多",
+        emoji: "😴",
+        image: memeSets.B[0],
+        description: "你的发疯方式是“不合作”。闹钟响了不起，小组作业摆烂，看到卷王直接闭眼。你不是真的没能力，而是用“躺平”来对抗过度的压力。发疯是你的非暴力不合作。但小心：完全躺平可能会让你错过真正在乎的东西。"
+      },
+      C: {
+        title: "深夜 emo 选手",
+        tag: "C 最多",
+        emoji: "😭",
+        image: memeSets.C[0],
+        description: "你白天看起来正常，晚上一个人偷偷 emo。你很少在公开场合发疯，但会在深夜的朋友圈发一首歌、一句“好累”。你的发疯是安静的内耗，需要被看见，也需要被接住。试着找一两个人说说吧，别总是一个人扛。"
+      },
+      D: {
+        title: "表演型发疯",
+        tag: "D 最多",
+        emoji: "🤡",
+        image: memeSets.D[2],
+        description: "你是朋友圈里的段子手，擅长把所有的焦虑、压力、崩溃包装成好笑的表情包和语录。你的发疯是一种主动的防御，我先笑了，生活就伤不到我。但记得：笑完之后，也要承认自己确实疼过。"
+      },
+      MIX: {
+        title: "复合型发疯",
+        tag: "并列最高",
+        emoji: "🤯",
+        image: memeSets.D[0],
+        description: "你的精神状态非常立体：努力、躺平、emo、整活可能在同一天轮流上线。你不是单一人格，而是一套完整的情绪生态系统。今天哪个模块先启动，主要取决于作业、闹钟和朋友圈。"
+      }
+    };
+
+    const labels = {
+      A: "疯癫打工人",
+      B: "躺平型发疯",
+      C: "深夜 emo 选手",
+      D: "表演型发疯"
+    };
+
+    const state = {
+      index: 0,
+      answers: Array(questions.length).fill(null)
+    };
+
+    const questionView = document.getElementById("questionView");
+    const resultView = document.getElementById("resultView");
+    const questionKicker = document.getElementById("questionKicker");
+    const questionTitle = document.getElementById("questionTitle");
+    const optionGrid = document.getElementById("optionGrid");
+    const progressText = document.getElementById("progressText");
+    const progressBar = document.getElementById("progressBar");
+    const scoreHint = document.getElementById("scoreHint");
+    const prevBtn = document.getElementById("prevBtn");
+    const pips = document.getElementById("pips");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultTag = document.getElementById("resultTag");
+    const resultDescription = document.getElementById("resultDescription");
+    const resultImage = document.getElementById("resultImage");
+    const resultEmoji = document.getElementById("resultEmoji");
+    const poster = document.getElementById("poster");
+    const answerStrip = document.getElementById("answerStrip");
+    const scoreList = document.getElementById("scoreList");
+    const toast = document.getElementById("toast");
+
+    function getScores() {
+      return state.answers.reduce((scores, answer) => {
+        if (answer) scores[answer] += 1;
+        return scores;
+      }, { A: 0, B: 0, C: 0, D: 0 });
+    }
+
+    function renderQuestion() {
+      const item = questions[state.index];
+      questionKicker.textContent = item.kicker;
+      questionTitle.textContent = item.title;
+      optionGrid.innerHTML = "";
+
+      ["A", "B", "C", "D"].forEach((choice) => {
+        const option = document.createElement("button");
+        option.className = "option";
+        option.type = "button";
+        option.dataset.choice = choice;
+        option.setAttribute("aria-label", `${choice}：${item.options[choice][0]}`);
+        option.innerHTML = `
+          <div class="meme-frame">
+            <span class="badge">${choice}</span>
+            <img src="${localMemeSets[choice][state.index]}" alt="" loading="eager" data-fallback-src="${memeSets[choice][state.index]}" />
+            <span class="fallback" aria-hidden="true">${fallbacks[choice]}</span>
+          </div>
+          <div class="option-copy">
+            <strong>${item.options[choice][0]}</strong>
+            <span>${item.options[choice][1]}</span>
+          </div>
+        `;
+        option.querySelector("img").addEventListener("error", () => {
+          option.classList.add("image-missing");
+        }, { once: true });
+        option.addEventListener("click", () => choose(choice));
+        optionGrid.append(option);
+      });
+
+      updateChrome();
+    }
+
+    function updateChrome() {
+      const answered = state.answers.filter(Boolean).length;
+      const scores = getScores();
+      progressText.textContent = state.index < questions.length
+        ? `第 ${Math.min(state.index + 1, questions.length)} / ${questions.length} 题`
+        : "测试结果";
+      progressBar.style.width = `${Math.round((answered / questions.length) * 100)}%`;
+      scoreHint.textContent = `A${scores.A} · B${scores.B} · C${scores.C} · D${scores.D}`;
+      prevBtn.disabled = state.index === 0 || resultView.classList.contains("active");
+      pips.innerHTML = "";
+
+      questions.forEach((_, index) => {
+        const pip = document.createElement("span");
+        pip.className = `pip${state.answers[index] ? " done" : ""}`;
+        pips.append(pip);
+      });
+    }
+
+    function choose(choice) {
+      state.answers[state.index] = choice;
+      if (state.index < questions.length - 1) {
+        state.index += 1;
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function calculateResult() {
+      const scores = getScores();
+      const high = Math.max(scores.A, scores.B, scores.C, scores.D);
+      const winners = Object.keys(scores).filter((choice) => scores[choice] === high);
+      return { scores, winners, resultKey: winners.length === 1 ? winners[0] : "MIX" };
+    }
+
+    function showResult() {
+      const { scores, winners, resultKey } = calculateResult();
+      const result = results[resultKey];
+      questionView.classList.remove("active");
+      resultView.classList.add("active");
+      resultTitle.textContent = result.title;
+      resultTag.textContent = resultKey === "MIX" ? `并列：${winners.join(" / ")}` : result.tag;
+      resultDescription.textContent = resultKey === "MIX"
+        ? `${result.description} 你的并列项是：${winners.map((choice) => labels[choice]).join("、")}。`
+        : result.description;
+      resultImage.src = localResultImages[resultKey];
+      resultImage.dataset.fallbackSrc = result.image;
+      resultImage.alt = result.title;
+      resultEmoji.textContent = result.emoji;
+      poster.classList.remove("image-missing");
+      resultImage.onerror = () => {
+        if (resultImage.dataset.fallbackSrc && resultImage.src.indexOf(resultImage.dataset.fallbackSrc) === -1) {
+          resultImage.src = resultImage.dataset.fallbackSrc;
+          return;
+        }
+        poster.classList.add("image-missing");
+      };
+      renderScores(scores);
+      updateChrome();
+      progressText.textContent = "测试结果";
+      progressBar.style.width = "100%";
+      prevBtn.disabled = true;
+    }
+
+    function renderScores(scores) {
+      answerStrip.innerHTML = "";
+      state.answers.forEach((answer, index) => {
+        const chip = document.createElement("div");
+        chip.className = "answer-chip";
+        chip.dataset.choice = answer;
+        chip.textContent = `${index + 1}.${answer}`;
+        answerStrip.append(chip);
+      });
+
+      scoreList.innerHTML = "";
+      ["A", "B", "C", "D"].forEach((choice) => {
+        const row = document.createElement("div");
+        row.className = "score-row";
+        row.dataset.choice = choice;
+        row.innerHTML = `
+          <header><span>${choice} · ${labels[choice]}</span><strong>${scores[choice]} / ${questions.length}</strong></header>
+          <div class="score-track"><div class="score-fill" style="width: ${(scores[choice] / questions.length) * 100}%"></div></div>
+        `;
+        scoreList.append(row);
+      });
+    }
+
+    function goBack() {
+      if (state.index === 0) return;
+      state.index -= 1;
+      renderQuestion();
+    }
+
+    function restart() {
+      state.index = 0;
+      state.answers = Array(questions.length).fill(null);
+      resultView.classList.remove("active");
+      questionView.classList.add("active");
+      renderQuestion();
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 1500);
+    }
+
+    async function copyResult() {
+      const { scores, winners, resultKey } = calculateResult();
+      const result = results[resultKey];
+      const text = `我的发疯人格：${result.title}\n分数：A${scores.A} / B${scores.B} / C${scores.C} / D${scores.D}\n${resultKey === "MIX" ? `并列项：${winners.join("、")}\n` : ""}${result.description}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("结果已复制");
+      } catch (error) {
+        showToast("复制失败，长按结果也可以选中");
+      }
+    }
+
+    prevBtn.addEventListener("click", goBack);
+    document.getElementById("restartTop").addEventListener("click", restart);
+    document.getElementById("restartResult").addEventListener("click", restart);
+    document.getElementById("copyResult").addEventListener("click", copyResult);
+
+    renderQuestion();
+  </script>
+</body>
+</html>
