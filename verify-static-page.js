@@ -25,15 +25,24 @@ assert(!/tenor\.com\/search/.test(html), "Tenor attribution links should be repl
 assert(!/data:image\//.test(html), "embedded base64 images should be split into asset files");
 assert(fs.statSync(htmlPath).size < 1024 * 1024, "index.html should stay under 1MB");
 assert((html.match(/assets\/memes\/pick\/q\d\/[ABCD]\.(?:gif|webp|png|jpe?g)/g) || []).length === 32, "pick page should reference 32 split question images");
+assert(/function preloadQuestionImages/.test(html), "next question image preloader missing");
+assert(/preloadQuestionImages\(state\.index \+ 1\)/.test(html), "next question preloading call missing");
+assert(/decoding="async"/.test(html), "async image decoding missing");
+assert(/loading="lazy"/.test(html), "lazy image loading missing");
+let totalPickImageBytes = 0;
 for (let question = 1; question <= 8; question += 1) {
   assert(fs.existsSync(path.join(root, "assets", "memes", "pick", `q${question}`)), `pick q${question} meme directory missing`);
   for (const choice of ["A", "B", "C", "D"]) {
     const dir = path.join(root, "assets", "memes", "pick", `q${question}`);
     const matches = fs.readdirSync(dir).filter((name) => new RegExp(`^${choice}\\.(gif|webp|png|jpe?g)$`, "i").test(name));
     assert(matches.length === 1, `pick ${question}/${choice} meme image missing`);
-    assert(fs.statSync(path.join(dir, matches[0])).size > 0, `pick ${question}/${choice} meme image is empty`);
+    const size = fs.statSync(path.join(dir, matches[0])).size;
+    totalPickImageBytes += size;
+    assert(size > 0, `pick ${question}/${choice} meme image is empty`);
+    assert(size < 1024 * 1024, `pick ${question}/${choice} meme image should stay under 1MB`);
   }
 }
+assert(totalPickImageBytes < 4 * 1024 * 1024, "pick meme images should stay under 4MB total");
 assert(fs.existsSync(path.join(root, "assets", "memes", "results")), "result meme directory missing");
 assert(/assets\/memes\/q\[题号\]\/\[选项\]\.png/.test(readme), "README question naming rule missing");
 assert(/assets\/memes\/results\/\[人格选项\]\.png/.test(readme), "README result naming rule missing");
@@ -53,6 +62,13 @@ const sandbox = {
       return 1;
     },
     clearInterval() {}
+  },
+  Image: function Image() {
+    return {
+      decoding: "",
+      loading: "",
+      src: ""
+    };
   },
   document: {
     getElementById() {

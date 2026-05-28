@@ -459,6 +459,8 @@
       height: 100%;
       object-fit: contain;
       display: block;
+      opacity: 1;
+      transition: opacity 0.18s ease;
     }
 
     .fallback {
@@ -466,6 +468,14 @@
       font-size: clamp(58px, 13vw, 110px);
       line-height: 1;
       filter: drop-shadow(4px 5px 0 rgba(23, 23, 23, 0.16));
+    }
+
+    .option.image-loading .meme-frame img {
+      opacity: 0;
+    }
+
+    .option.image-loading .fallback {
+      display: block;
     }
 
     .option.image-missing img {
@@ -1096,11 +1106,11 @@
   <script>
     const memeSets = {
       A: [
-        "assets/memes/pick/q1/A.gif",
+        "assets/memes/pick/q1/A.webp",
         "assets/memes/pick/q1/B.webp",
-        "assets/memes/pick/q1/C.gif",
+        "assets/memes/pick/q1/C.webp",
         "assets/memes/pick/q1/D.webp",
-        "assets/memes/pick/q2/A.gif",
+        "assets/memes/pick/q2/A.webp",
         "assets/memes/pick/q2/B.webp",
         "assets/memes/pick/q2/C.gif",
         "assets/memes/pick/q2/D.webp"
@@ -1110,26 +1120,26 @@
         "assets/memes/pick/q3/B.webp",
         "assets/memes/pick/q3/C.webp",
         "assets/memes/pick/q3/D.webp",
-        "assets/memes/pick/q4/A.gif",
+        "assets/memes/pick/q4/A.webp",
         "assets/memes/pick/q4/B.webp",
         "assets/memes/pick/q4/C.webp",
-        "assets/memes/pick/q4/D.gif"
+        "assets/memes/pick/q4/D.webp"
       ],
       C: [
-        "assets/memes/pick/q5/A.gif",
+        "assets/memes/pick/q5/A.webp",
         "assets/memes/pick/q5/B.gif",
         "assets/memes/pick/q5/C.webp",
         "assets/memes/pick/q5/D.webp",
-        "assets/memes/pick/q6/A.gif",
+        "assets/memes/pick/q6/A.webp",
         "assets/memes/pick/q6/B.webp",
-        "assets/memes/pick/q6/C.gif",
+        "assets/memes/pick/q6/C.webp",
         "assets/memes/pick/q6/D.webp"
       ],
       D: [
         "assets/memes/pick/q7/A.gif",
-        "assets/memes/pick/q7/B.gif",
+        "assets/memes/pick/q7/B.webp",
         "assets/memes/pick/q7/C.gif",
-        "assets/memes/pick/q7/D.gif",
+        "assets/memes/pick/q7/D.webp",
         "assets/memes/pick/q8/A.gif",
         "assets/memes/pick/q8/B.gif",
         "assets/memes/pick/q8/C.gif",
@@ -1143,6 +1153,8 @@
       C: "😭",
       D: "🤡"
     };
+
+    const preloadCache = new Map();
 
     const questions = [
       {
@@ -1404,7 +1416,7 @@
 
       ["A", "B", "C", "D"].forEach((choice, choiceIndex) => {
         const option = document.createElement("button");
-        option.className = "option";
+        option.className = "option image-loading";
         option.style.setProperty("--delay", `${choiceIndex * 0.055}s`);
         option.type = "button";
         option.dataset.choice = choice;
@@ -1412,7 +1424,7 @@
         option.innerHTML = `
           <div class="meme-frame">
             <span class="badge">${choice}</span>
-            <img src="${memeSets[choice][state.index]}" alt="" loading="eager" />
+            <img src="${memeSets[choice][state.index]}" alt="" loading="lazy" decoding="async" />
             <span class="fallback" aria-hidden="true">${fallbacks[choice]}</span>
           </div>
           <div class="option-copy">
@@ -1420,14 +1432,33 @@
             <span>${item.options[choice][1]}</span>
           </div>
         `;
-        option.querySelector("img").addEventListener("error", () => {
+        const img = option.querySelector("img");
+        img.addEventListener("load", () => {
+          option.classList.remove("image-loading");
+        }, { once: true });
+        img.addEventListener("error", () => {
+          option.classList.remove("image-loading");
           option.classList.add("image-missing");
         }, { once: true });
         option.addEventListener("click", () => choose(choice, option));
         optionGrid.append(option);
       });
 
+      preloadQuestionImages(state.index + 1);
       updateChrome();
+    }
+
+    function preloadQuestionImages(questionIndex) {
+      if (questionIndex < 0 || questionIndex >= questions.length) return;
+      ["A", "B", "C", "D"].forEach((choice) => {
+        const src = memeSets[choice][questionIndex];
+        if (!src || preloadCache.has(src)) return;
+        const img = new Image();
+        img.decoding = "async";
+        img.loading = "eager";
+        img.src = src;
+        preloadCache.set(src, img);
+      });
     }
 
     function updateChrome() {
